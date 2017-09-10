@@ -1,1 +1,6 @@
 *.ipch
+PEParserClient/x64/
+PEParser/x64/
+PEParser/Debug/
+*.db-shm
+*.db-wal

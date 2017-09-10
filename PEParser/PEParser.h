@@ -8,51 +8,38 @@ using namespace std;
 
 namespace PEParser {
 
-	typedef void * PEHANDLE;
-	
-	list<PEHANDLE> g_PEHandleList;
-
-	PEHANDLE OpenPEFile();
-	void FreePEHandle(PEHANDLE m_PEHandle);
-
 	enum PEFileType {
 		NOT_A_PE_FILE,
 		EXE_FILE,
 		DLL_FILE,
 		SYS_FILE,
-		NO_SUPPORT
+		NOT_SUPPORTED
 	};
 
 	enum BITNess {
 		BITNESS_64,
-		BITNESS_32
+		BITNESS_32,
+		BITNESS_UNKNOWN
 	};
 
+	typedef void * PEHANDLE;
+	extern list<PEHANDLE> g_PEHandleList;
 
-	class PEHeaderInfo {
+	PEHANDLE OpenPEFile(wstring const & p_PEFilePath);
+	void FreePEFile(PEHANDLE m_PEHandle);
 
+	PEFileType getPEFileType(PEHANDLE p_PEHandle);
+	BITNess getBITNess(PEHANDLE p_PEHandle);
+	IMAGE_DOS_HEADER getDOSHeader(PEHANDLE p_PEHandle);
+	IMAGE_FILE_HEADER getFileHeader(PEHANDLE p_PEHandle);
+	IMAGE_OPTIONAL_HEADER64 getOptHeader64(PEHANDLE p_PEHandle);
+	IMAGE_OPTIONAL_HEADER32 getOptHeader32(PEHANDLE p_PEHandle);
+
+	class PEParserException {
 		public:
-			PEHeaderInfo();
-			~PEHeaderInfo();
-
-			wstring getFilePath();
-			PEFileType getPEFileType();
-			BITNess getBITNess();
-			IMAGE_DOS_HEADER getDOSHeader();
-			IMAGE_FILE_HEADER getFileHeader();
-			IMAGE_OPTIONAL_HEADER64 getOptHeader64();
-			IMAGE_OPTIONAL_HEADER32 getOptHeader32();
-
-		private:
-
-			wstring filePath;
-
-			PEFileType m_PEFileType;
-			BITNess m_BITNess;
-
-			PIMAGE_DOS_HEADER m_dosHeader;
-			PIMAGE_FILE_HEADER m_fileHeader;
-			PIMAGE_OPTIONAL_HEADER64 m_optionalHeader64;
-			PIMAGE_OPTIONAL_HEADER32 m_optionalHeader32;
+			wstring m_error_data;
+			PEParserException(wstring const & p_error_data) {
+				m_error_data = p_error_data;
+			}
 	};
 }
