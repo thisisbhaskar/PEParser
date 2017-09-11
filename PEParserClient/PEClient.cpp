@@ -5,7 +5,7 @@ using namespace PEParser;
 
 int main() {
 
-	PEHANDLE l_peHandle = PEParser::OpenFile(L"C:\\Windows\\System32\\ntdll.dll");
+	PEHANDLE l_peHandle = PEParser::OpenFile(L"C:\\Windows\\System32\\notepad.exe");
 
 	if (NULL != l_peHandle) {
 
