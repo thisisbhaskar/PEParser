@@ -7,7 +7,7 @@ list<PEHANDLE> PEParser::g_PEHandleList;
 
 namespace PEParser {
 
-	PEHANDLE OpenPEFile(wstring const & p_PEFilePath) {
+	PEHANDLE OpenFile(wstring const & p_PEFilePath) {
 
 		HANDLE l_fileHandle = CreateFile(p_PEFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (INVALID_HANDLE_VALUE == l_fileHandle) {
@@ -19,7 +19,7 @@ namespace PEParser {
 		return (PEHANDLE)l_PEInfo;
 	}
 
-	void FreePEFile(PEHANDLE p_PEHandle) {
+	void CloseFile(PEHANDLE p_PEHandle) {
 
 		if (NULL != p_PEHandle) {
 			delete (PEInfo*)(p_PEHandle);
@@ -89,40 +89,143 @@ namespace PEParser {
 			return;
 		}
 
+		try {
+			getDOSHeader(); /* Get DOS Header */
+			getNTHeader();  /* Get NT Header (including Optinal Header) */
+			m_cachedData.insert(CachedData::PE_HEADER_INFO); /* Mark cached */
+		}
+		catch (PEParser::PEParserException const & l_exception) {
+			m_PEHeaderInfo->reset(); /* Reset Cache  */
+			throw l_exception;
+		}
+
+	}
+
+	void PEInfo::getDOSHeader() {
+
 		/* Initialize header information */
 		IMAGE_DOS_HEADER l_dos_header;
 		DWORD l_bytes_read;
 		bool l_successful = ReadFile(m_PEFileHandle, &l_dos_header, sizeof(IMAGE_DOS_HEADER), &l_bytes_read, NULL);
-		if (l_successful) {
-			if (0 == l_bytes_read) {
-				m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
-			}
-			else {
-				if (sizeof(IMAGE_DOS_HEADER) == l_bytes_read) {
-					if (IMAGE_DOS_SIGNATURE == l_dos_header.e_magic) {
-						m_PEHeaderInfo->setDOSHeader(l_dos_header);
-						m_PEHeaderInfo->setPEFileType(PEFileType::NOT_SUPPORTED);
-					}
-					else {
-						m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
-					}
-				}
-				else {
-					m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
-				}
-			}
-		}
-		else {
+		if (!l_successful) {
 			/* Failed to read data */
 			throw PEParser::PEParserException(L"Failed to read data.");
 		}
 
+		if (0 == l_bytes_read) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+			return;
+		}
 
-		m_cachedData.insert(CachedData::PE_HEADER_INFO); /* Mark cached */
+		if (sizeof(IMAGE_DOS_HEADER) != l_bytes_read) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+			return;
+		}
+
+		if (IMAGE_DOS_SIGNATURE != l_dos_header.e_magic) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+			return;
+		}
+
+		/* Set DOS Header */
+		m_PEHeaderInfo->setDOSHeader(l_dos_header); 
+		m_PEHeaderInfo->hasDOSHeader(true);
+
+	}
+
+	void PEInfo::getNTHeader() {
+
+		bool l_hasDOSHeader = m_PEHeaderInfo->hasDOSHeader();
+		if (!l_hasDOSHeader) {
+			return; /* No DOS Header */
+		}
+
+		/* Seek to File Header position */
+		IMAGE_DOS_HEADER l_dos_header = m_PEHeaderInfo->getDOSHeader();
+		LONG l_elf_position = l_dos_header.e_lfanew;
+		DWORD l_move_return = SetFilePointer(m_PEFileHandle, l_elf_position, NULL, FILE_BEGIN);
+		if (INVALID_SET_FILE_POINTER == l_move_return) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+			return;
+		}
+
+		/* Attempt to read File Header */
+		IMAGE_NT_HEADERS32 l_image_file_header;
+		DWORD l_bytes_read;
+		bool l_successful = ReadFile(m_PEFileHandle, &l_image_file_header, sizeof(IMAGE_NT_HEADERS32), &l_bytes_read, NULL);
+		if (!l_successful) {
+			throw PEParser::PEParserException(L"Failed to read data.");
+		}
+
+		if (0 == l_bytes_read) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+			return;
+		}
+
+		if (IMAGE_NT_SIGNATURE != l_image_file_header.Signature) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+			return;
+		} 
+
+		m_PEHeaderInfo->setFileHeader(l_image_file_header.FileHeader); /* Set File Header */
+		m_PEHeaderInfo->hasNTHeader(true);
+
+		/* Get Image Type */
+		WORD l_characterstics = l_image_file_header.FileHeader.Characteristics;
+		if (!(IMAGE_FILE_EXECUTABLE_IMAGE & l_characterstics)) {
+			/* We don't support currently */
+			m_PEHeaderInfo->setPEFileType(PEFileType::NOT_SUPPORTED);
+		}
+
+		if (IMAGE_FILE_DLL & l_characterstics) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::DLL_FILE);
+		}
+		else if (IMAGE_FILE_SYSTEM & l_characterstics) {
+			m_PEHeaderInfo->setPEFileType(PEFileType::SYS_FILE);
+		}
+		else {
+			/* TODO: EXE ???? */
+			m_PEHeaderInfo->setPEFileType(PEFileType::EXE_FILE);
+		}
+
+		/* Get BITNess (32 or 64) */
+		WORD l_opt_header_magic = l_image_file_header.OptionalHeader.Magic;
+		if (IMAGE_NT_OPTIONAL_HDR32_MAGIC == l_opt_header_magic) {
+			m_PEHeaderInfo->setBITNess(BITNess::BITNESS_32);
+			m_PEHeaderInfo->setOptHeader32(l_image_file_header.OptionalHeader);
+		}
+		else if (IMAGE_NT_OPTIONAL_HDR64_MAGIC == l_opt_header_magic) {
+
+			m_PEHeaderInfo->setBITNess(BITNess::BITNESS_64);
+
+			DWORD l_move_return = SetFilePointer(m_PEFileHandle, l_elf_position, NULL, FILE_BEGIN);
+			if (INVALID_SET_FILE_POINTER == l_move_return) {
+				m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+				return;
+			}
+
+			/* Get 64 BIT header */
+			IMAGE_NT_HEADERS64 l_image_file_header;
+			DWORD l_bytes_read;
+			bool l_successful = ReadFile(m_PEFileHandle, &l_image_file_header, sizeof(IMAGE_NT_HEADERS64), &l_bytes_read, NULL);
+			if (!l_successful) {
+				throw PEParser::PEParserException(L"Failed to read data.");
+			}
+
+			if (0 == l_bytes_read) {
+				m_PEHeaderInfo->setPEFileType(PEFileType::NOT_A_PE_FILE);
+				return;
+			}
+			else {
+				m_PEHeaderInfo->setOptHeader64(l_image_file_header.OptionalHeader);
+			}
+		}
 	}
 
 	PEHeaderInfo::PEHeaderInfo() {
 
+		m_hasDosHeader = false;
+		m_hasNTHeader = false;
 		m_PEFileType = PEFileType::NOT_SUPPORTED;
 		m_BITNess = BITNess::BITNESS_UNKNOWN;
 		m_dosHeader = NULL;
@@ -137,6 +240,8 @@ namespace PEParser {
 
 	void PEHeaderInfo::reset() {
 
+		m_hasDosHeader = false;
+		m_hasNTHeader = false;
 		m_PEFileType = PEFileType::NOT_SUPPORTED;
 		m_BITNess = BITNess::BITNESS_UNKNOWN;
 

@@ -25,8 +25,8 @@ namespace PEParser {
 	typedef void * PEHANDLE;
 	extern list<PEHANDLE> g_PEHandleList;
 
-	PEHANDLE OpenPEFile(wstring const & p_PEFilePath);
-	void FreePEFile(PEHANDLE m_PEHandle);
+	PEHANDLE OpenFile(wstring const & p_PEFilePath);
+	void CloseFile(PEHANDLE m_PEHandle);
 
 	PEFileType getPEFileType(PEHANDLE p_PEHandle);
 	BITNess getBITNess(PEHANDLE p_PEHandle);

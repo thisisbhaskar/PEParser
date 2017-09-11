@@ -23,9 +23,13 @@ namespace PEParser {
 			enum CachedData {
 				PE_HEADER_INFO
 			};
+
 			PEHeaderInfo * m_PEHeaderInfo;
 
 		private:
+
+			void getDOSHeader();
+			void getNTHeader();
 
 			HANDLE const m_PEFileHandle;
 			set<CachedData> m_cachedData;
@@ -37,6 +41,22 @@ namespace PEParser {
 
 			PEHeaderInfo();
 			~PEHeaderInfo();
+
+			bool hasDOSHeader() {
+				return m_hasDosHeader;
+			}
+
+			void hasDOSHeader(bool p_hasDOSHeader) {
+				m_hasDosHeader = p_hasDOSHeader;
+			}
+
+			bool hasNTHeader() {
+				return m_hasNTHeader;
+			}
+
+			void hasNTHeader(bool p_hasNTHeader) {
+				m_hasNTHeader = p_hasNTHeader;
+			}
 
 			PEFileType getPEFileType() {
 				return m_PEFileType;
@@ -110,6 +130,8 @@ namespace PEParser {
 
 		private:
 
+			bool m_hasDosHeader;
+			bool m_hasNTHeader;
 			PEFileType m_PEFileType;
 			BITNess m_BITNess;
 			PIMAGE_DOS_HEADER m_dosHeader;

@@ -5,12 +5,12 @@ using namespace PEParser;
 
 int main() {
 
-	PEHANDLE l_peHandle = PEParser::OpenPEFile(L"C:\\Windows\\System32\\Notepad.exe");
+	PEHANDLE l_peHandle = PEParser::OpenFile(L"C:\\Windows\\System32\\ntdll.dll");
 
 	if (NULL != l_peHandle) {
 
 		PEParser::getPEFileType(l_peHandle);
-		PEParser::FreePEFile(l_peHandle);
+		PEParser::CloseFile(l_peHandle);
 	}
 	return 0;
 }
