@@ -2,6 +2,7 @@
 
 #include "PEParser.h"
 #include <Windows.h>
+
 #include <string>
 #include <list>
 #include <set>
@@ -25,11 +26,13 @@ namespace PEParser {
 			};
 
 			PEHeaderInfo * m_PEHeaderInfo;
+			bool getSectionHeaders(PEHANDLE p_PEHandle, IMAGE_SECTION_HEADER* p_buffer, size_t p_size_of_buffer);
 
 		private:
 
 			void getDOSHeader();
 			void getNTHeader();
+			void getSectionHeaders();
 
 			HANDLE const m_PEFileHandle;
 			set<CachedData> m_cachedData;
@@ -58,7 +61,7 @@ namespace PEParser {
 				m_hasNTHeader = p_hasNTHeader;
 			}
 
-			PEFileType getPEFileType() {
+			PEFileType getFileType() {
 				return m_PEFileType;
 			}
 
@@ -67,19 +70,19 @@ namespace PEParser {
 			}
 
 			IMAGE_DOS_HEADER getDOSHeader() {
-				return *m_dosHeader;
+				return m_dosHeader;
 			}
 
 			IMAGE_FILE_HEADER getFileHeader() {
-				return *m_fileHeader;
+				return m_fileHeader;
 			}
 
 			IMAGE_OPTIONAL_HEADER64 getOptHeader64() {
-				return *m_optionalHeader64;
+				return m_optionalHeader64;
 			}
 
 			IMAGE_OPTIONAL_HEADER32 getOptHeader32() {
-				return *m_optionalHeader32;
+				return m_optionalHeader32;
 			}
 
 			void setPEFileType(PEFileType const & p_PEFileType) {
@@ -91,52 +94,36 @@ namespace PEParser {
 			}
 
 			void setDOSHeader(IMAGE_DOS_HEADER const & p_image_dos_header) {
-
-				if (NULL == m_dosHeader) {
-					m_dosHeader = new  IMAGE_DOS_HEADER();
-				}
-
-				*m_dosHeader = p_image_dos_header;
+				m_dosHeader = p_image_dos_header;
 			}
 
 			void setFileHeader(IMAGE_FILE_HEADER const & p_image_file_header) {
-
-				if (NULL == m_fileHeader) {
-					m_fileHeader = new  IMAGE_FILE_HEADER();
-				}
-
-				*m_fileHeader = p_image_file_header;
+				m_fileHeader = p_image_file_header;
 			}
 
 			void setOptHeader64(IMAGE_OPTIONAL_HEADER64 const & p_image_opt_header64) {
-
-				if (NULL == m_optionalHeader64) {
-					m_optionalHeader64 = new  IMAGE_OPTIONAL_HEADER64();
-				}
-
-				*m_optionalHeader64 = p_image_opt_header64;
+				m_optionalHeader64 = p_image_opt_header64;
 			}
 
 			void setOptHeader32(IMAGE_OPTIONAL_HEADER32 const & p_image_opt_header32) {
+				m_optionalHeader32 = p_image_opt_header32;
+			}
 
-				if (NULL == m_optionalHeader32) {
-					m_optionalHeader32 = new  IMAGE_OPTIONAL_HEADER32();
-				}
-
-				*m_optionalHeader32 = p_image_opt_header32;
+			size_t getNoOfSections() {
+				return m_noOfSections;
 			}
 
 			void reset();
-
-		private:
 
 			bool m_hasDosHeader;
 			bool m_hasNTHeader;
 			PEFileType m_PEFileType;
 			BITNess m_BITNess;
-			PIMAGE_DOS_HEADER m_dosHeader;
-			PIMAGE_FILE_HEADER m_fileHeader;
-			PIMAGE_OPTIONAL_HEADER64 m_optionalHeader64;
-			PIMAGE_OPTIONAL_HEADER32 m_optionalHeader32;
+			IMAGE_DOS_HEADER m_dosHeader;
+			IMAGE_FILE_HEADER m_fileHeader;
+			IMAGE_OPTIONAL_HEADER64 m_optionalHeader64;
+			IMAGE_OPTIONAL_HEADER32 m_optionalHeader32;
+			size_t m_noOfSections;
+			IMAGE_SECTION_HEADER * m_sectionHeaderStart;
 	};
 }

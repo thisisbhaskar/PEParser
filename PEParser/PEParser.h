@@ -28,12 +28,14 @@ namespace PEParser {
 	PEHANDLE OpenFile(wstring const & p_PEFilePath);
 	void CloseFile(PEHANDLE m_PEHandle);
 
-	PEFileType getPEFileType(PEHANDLE p_PEHandle);
+	PEFileType getFileType(PEHANDLE p_PEHandle);
 	BITNess getBITNess(PEHANDLE p_PEHandle);
 	IMAGE_DOS_HEADER getDOSHeader(PEHANDLE p_PEHandle);
 	IMAGE_FILE_HEADER getFileHeader(PEHANDLE p_PEHandle);
 	IMAGE_OPTIONAL_HEADER64 getOptHeader64(PEHANDLE p_PEHandle);
 	IMAGE_OPTIONAL_HEADER32 getOptHeader32(PEHANDLE p_PEHandle);
+	size_t getNoOfSectionHeaders(PEHANDLE p_PEHandle);
+	bool getSectionHeaders(PEHANDLE p_PEHandle, IMAGE_SECTION_HEADER* p_buffer, size_t p_size_of_buffer);
 
 	class PEParserException {
 		public:
