@@ -35,7 +35,7 @@ namespace PEParser {
 	IMAGE_OPTIONAL_HEADER64 getOptHeader64(PEHANDLE p_PEHandle);
 	IMAGE_OPTIONAL_HEADER32 getOptHeader32(PEHANDLE p_PEHandle);
 	size_t getNoOfSectionHeaders(PEHANDLE p_PEHandle);
-	bool getSectionHeaders(PEHANDLE p_PEHandle, IMAGE_SECTION_HEADER* p_buffer, size_t p_size_of_buffer);
+    IMAGE_SECTION_HEADER* getSectionHeaders(PEHANDLE p_PEHandle, size_t & p_no_of_sections);
 
 	class PEParserException {
 		public:

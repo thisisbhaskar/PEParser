@@ -26,7 +26,6 @@ namespace PEParser {
 			};
 
 			PEHeaderInfo * m_PEHeaderInfo;
-			bool getSectionHeaders(PEHANDLE p_PEHandle, IMAGE_SECTION_HEADER* p_buffer, size_t p_size_of_buffer);
 
 		private:
 

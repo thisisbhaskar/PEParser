@@ -4,3 +4,5 @@ PEParser/x64/
 PEParser/Debug/
 *.db-shm
 *.db-wal
+*.db
+*.opendb
