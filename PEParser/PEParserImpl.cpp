@@ -8,7 +8,7 @@ using namespace PEParser;
 PEInfo::PEInfo(HANDLE const & p_fileHandle,
                HANDLE const & p_filemapping_handle,
                PVOID const p_view_ponter) 
-    : m_PEFileHandle(p_fileHandle),
+    : m_pe_file_handle(p_fileHandle),
       m_filemapping_handle(p_filemapping_handle),
       m_view_pointer(p_view_ponter)
 {
@@ -21,7 +21,7 @@ PEInfo::PEInfo(HANDLE const & p_fileHandle,
 PEInfo::~PEInfo()
 {
     delete m_pe_headers_info;
-    CloseHandle(m_PEFileHandle);
+    CloseHandle(m_pe_file_handle);
     CloseHandle(m_filemapping_handle);
     UnmapViewOfFile(m_view_pointer);
 }
@@ -205,7 +205,6 @@ PEHeaderInfo::~PEHeaderInfo()
 */
 void PEHeaderInfo::reset()
 {
-
     m_has_dos_header = false;
     m_has_nt_header = false;
     m_pe_type = PEFileType::NOT_SUPPORTED;

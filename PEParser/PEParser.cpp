@@ -7,7 +7,6 @@ list<PEHANDLE> PEParser::g_PEHandleList;
 
 namespace PEParser
 {
-
     /**
     * Open file resouce handle
     */
@@ -78,20 +77,20 @@ namespace PEParser
     /**
     * Close file resouce handle
     */
-    void CloseFile(PEHANDLE p_PEHandle)
+    void CloseFile(PEHANDLE p_pe_handle)
     {
-        if (NULL != p_PEHandle)
+        if (NULL != p_pe_handle)
         {
-            delete (PEInfo*)(p_PEHandle);
+            delete (PEInfo*)(p_pe_handle);
         }
     }
 
     /**
     * Get file type
     */
-    PEFileType getFileType(PEHANDLE p_PEHandle)
+    PEFileType getFileType(PEHANDLE p_pe_handle)
     {
-        PEInfo * l_PEInfo = (PEInfo*)p_PEHandle;
+        PEInfo * l_PEInfo = (PEInfo*)p_pe_handle;
         l_PEInfo->readHeaderData();
 
         return l_PEInfo->m_pe_headers_info->getFileType();
@@ -100,9 +99,9 @@ namespace PEParser
     /**
     * Bet BIT ness. Valid only if the file is a valid binary
     */
-    BITNess getBITNess(PEHANDLE p_PEHandle)
+    BITNess getBITNess(PEHANDLE p_pe_handle)
     {
-        PEInfo * l_PEInfo = (PEInfo*)p_PEHandle;
+        PEInfo * l_PEInfo = (PEInfo*)p_pe_handle;
         l_PEInfo->readHeaderData();
 
         return l_PEInfo->m_pe_headers_info->getBITNess();
@@ -111,10 +110,9 @@ namespace PEParser
     /**
     * Get Does header. Valid only if the file is a valid binary
     */
-    IMAGE_DOS_HEADER getDOSHeader(PEHANDLE p_PEHandle)
+    IMAGE_DOS_HEADER getDOSHeader(PEHANDLE p_pe_handle)
     {
-
-        PEInfo * l_PEInfo = (PEInfo*)p_PEHandle;
+        PEInfo * l_PEInfo = (PEInfo*)p_pe_handle;
         l_PEInfo->readHeaderData();
 
         return l_PEInfo->m_pe_headers_info->getDOSHeader();
@@ -123,10 +121,9 @@ namespace PEParser
     /**
     * Get File header. Valid only if the file is a valid binary
     */
-    IMAGE_FILE_HEADER getFileHeader(PEHANDLE p_PEHandle)
+    IMAGE_FILE_HEADER getFileHeader(PEHANDLE p_pe_handle)
     {
-
-        PEInfo * l_PEInfo = (PEInfo*)p_PEHandle;
+        PEInfo * l_PEInfo = (PEInfo*)p_pe_handle;
         l_PEInfo->readHeaderData();
 
         return l_PEInfo->m_pe_headers_info->getFileHeader();
@@ -135,9 +132,9 @@ namespace PEParser
     /**
     * Get 64bit optinal header. Valid only if the file is 64bit binary
     */
-    IMAGE_OPTIONAL_HEADER64 getOptHeader64(PEHANDLE p_PEHandle)
+    IMAGE_OPTIONAL_HEADER64 getOptHeader64(PEHANDLE p_pe_handle)
     {
-        PEInfo * l_PEInfo = (PEInfo*)p_PEHandle;
+        PEInfo * l_PEInfo = (PEInfo*)p_pe_handle;
         l_PEInfo->readHeaderData();
 
         return l_PEInfo->m_pe_headers_info->getOptHeader64();
@@ -146,9 +143,9 @@ namespace PEParser
     /**
     * Get 32bit optinal header. Valid only if the file is 32bit binary
     */
-    IMAGE_OPTIONAL_HEADER32 getOptHeader32(PEHANDLE p_PEHandle)
+    IMAGE_OPTIONAL_HEADER32 getOptHeader32(PEHANDLE p_pe_handle)
     {
-        PEInfo * l_PEInfo = (PEInfo*)p_PEHandle;
+        PEInfo * l_PEInfo = (PEInfo*)p_pe_handle;
         l_PEInfo->readHeaderData();
 
         return l_PEInfo->m_pe_headers_info->getOptHeader32();
@@ -157,9 +154,9 @@ namespace PEParser
     /**
     * Get number of section headers. Valid only if the file is a valid binary
     */
-    size_t getNoOfSectionHeaders(PEHANDLE p_PEHandle)
+    size_t getNoOfSectionHeaders(PEHANDLE p_pe_handle)
     {
-        PEInfo * l_PEInfo = (PEInfo*)p_PEHandle;
+        PEInfo * l_PEInfo = (PEInfo*)p_pe_handle;
         l_PEInfo->readHeaderData();
 
         return l_PEInfo->m_pe_headers_info->getNoOfSections();
@@ -171,13 +168,12 @@ namespace PEParser
     * client is done with using the buffer.
     * Also copies number of sections in the p_no_of_sections parameter
     */
-    IMAGE_SECTION_HEADER* getSectionHeaders(PEHANDLE p_PEHandle, size_t & p_no_of_sections)
+    IMAGE_SECTION_HEADER* getSectionHeaders(PEHANDLE p_pe_handle, size_t & p_no_of_sections)
     {
-
-        PEInfo * l_pe_info = (PEInfo*)p_PEHandle;
+        PEInfo * l_pe_info = (PEInfo*)p_pe_handle;
         l_pe_info->readHeaderData();
 
-        p_no_of_sections = getNoOfSectionHeaders(p_PEHandle);
+        p_no_of_sections = getNoOfSectionHeaders(p_pe_handle);
         size_t l_req_size = p_no_of_sections * sizeof(IMAGE_SECTION_HEADER);
         IMAGE_SECTION_HEADER* l_buffer = (IMAGE_SECTION_HEADER*)malloc(l_req_size);
         memcpy_s(l_buffer, l_req_size, l_pe_info->m_pe_headers_info->m_sect_header_start, l_req_size);

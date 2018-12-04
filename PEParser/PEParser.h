@@ -31,17 +31,17 @@ namespace PEParser {
 	typedef void * PEHANDLE;
 	extern list<PEHANDLE> g_PEHandleList;
 
-	PEHANDLE OpenFile(wstring const & p_PEFilePath);
+	PEHANDLE OpenFile(wstring const & p_pe_filepath);
 	void CloseFile(PEHANDLE m_PEHandle);
 
-	PEFileType getFileType(PEHANDLE p_PEHandle);
-	BITNess getBITNess(PEHANDLE p_PEHandle);
-	IMAGE_DOS_HEADER getDOSHeader(PEHANDLE p_PEHandle);
-	IMAGE_FILE_HEADER getFileHeader(PEHANDLE p_PEHandle);
-	IMAGE_OPTIONAL_HEADER64 getOptHeader64(PEHANDLE p_PEHandle);
-	IMAGE_OPTIONAL_HEADER32 getOptHeader32(PEHANDLE p_PEHandle);
-	size_t getNoOfSectionHeaders(PEHANDLE p_PEHandle);
-    IMAGE_SECTION_HEADER* getSectionHeaders(PEHANDLE p_PEHandle, size_t & p_no_of_sections);
+	PEFileType getFileType(PEHANDLE p_pe_handle);
+	BITNess getBITNess(PEHANDLE p_pe_handle);
+	IMAGE_DOS_HEADER getDOSHeader(PEHANDLE p_pe_handle);
+	IMAGE_FILE_HEADER getFileHeader(PEHANDLE p_pe_handle);
+	IMAGE_OPTIONAL_HEADER64 getOptHeader64(PEHANDLE p_pe_handle);
+	IMAGE_OPTIONAL_HEADER32 getOptHeader32(PEHANDLE p_pe_handle);
+	size_t getNoOfSectionHeaders(PEHANDLE p_pe_handle);
+    IMAGE_SECTION_HEADER* getSectionHeaders(PEHANDLE p_pe_handle, size_t & p_no_of_sections);
 
 	class PEParserException {
 		public:

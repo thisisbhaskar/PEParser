@@ -35,7 +35,7 @@ namespace PEParser {
 			void getNTHeader();
 			void getSectionHeaders();
 
-			HANDLE const m_PEFileHandle;
+			HANDLE const m_pe_file_handle;
             HANDLE const m_filemapping_handle;
             PVOID const m_view_pointer;
 			set<CachedData> m_cached_data;
@@ -52,16 +52,16 @@ namespace PEParser {
 				return m_has_dos_header;
 			}
 
-			void hasDOSHeader(bool p_hasDOSHeader) {
-				m_has_dos_header = p_hasDOSHeader;
+			void hasDOSHeader(bool p_has_dos_header) {
+				m_has_dos_header = p_has_dos_header;
 			}
 
 			bool hasNTHeader() {
 				return m_has_nt_header;
 			}
 
-			void hasNTHeader(bool p_hasNTHeader) {
-				m_has_nt_header = p_hasNTHeader;
+			void hasNTHeader(bool p_has_nt_header) {
+				m_has_nt_header = p_has_nt_header;
 			}
 
 			PEFileType getFileType() {
@@ -88,12 +88,12 @@ namespace PEParser {
 				return m_opt_header32;
 			}
 
-			void setPEFileType(PEFileType const & p_PEFileType) {
-				m_pe_type = p_PEFileType;
+			void setPEFileType(PEFileType const & p_pe_filetype) {
+				m_pe_type = p_pe_filetype;
 			}
 
-			void setBITNess(BITNess const & p_PEBITNess) {
-				m_bitness = p_PEBITNess;
+			void setBITNess(BITNess const & p_pe_bitness) {
+				m_bitness = p_pe_bitness;
 			}
 
 			void setDOSHeader(IMAGE_DOS_HEADER const & p_image_dos_header) {
