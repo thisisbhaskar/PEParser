@@ -16,6 +16,12 @@ namespace PEParser {
 		NOT_SUPPORTED
 	};
 
+    inline bool IsSupportedPEType(PEFileType p_type)
+    {
+        return (PEFileType::NOT_SUPPORTED != p_type &&
+                PEFileType::NOT_A_PE_FILE != p_type);
+    }
+
 	enum BITNess {
 		BITNESS_64,
 		BITNESS_32,
