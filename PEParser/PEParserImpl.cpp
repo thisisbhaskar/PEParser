@@ -200,6 +200,7 @@ PEHeaderInfo::~PEHeaderInfo()
 {
     reset();
 }
+
 /**
 * Reset the PE header data.
 */
@@ -210,10 +211,5 @@ void PEHeaderInfo::reset()
     m_pe_type = PEFileType::NOT_SUPPORTED;
     m_bitness = BITNess::BITNESS_UNKNOWN;
     m_no_sections = 0;
-
-    if (m_sect_header_start)
-    {
-        free(m_sect_header_start);
-        m_sect_header_start = NULL;
-    }
+    m_sect_header_start = NULL;
 }

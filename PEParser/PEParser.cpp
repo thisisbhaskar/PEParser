@@ -10,13 +10,13 @@ namespace PEParser
     /**
     * Open file resouce handle
     */
-    PEHANDLE OpenFile(wstring const & p_PEFilePath)
+    PEHANDLE OpenFile(wstring const & p_filepath)
     {
         bool l_continue = true;
 
         /* File Handle */
         HANDLE l_file_handle = NULL;
-        l_file_handle = CreateFile(p_PEFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        l_file_handle = CreateFile(p_filepath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (INVALID_HANDLE_VALUE == l_file_handle)
         {
             l_continue = false;
